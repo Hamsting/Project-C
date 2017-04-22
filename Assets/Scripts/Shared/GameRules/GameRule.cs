@@ -7,6 +7,17 @@ public class GameRule
 
 
 
+	public static GameRule GetGameRule(GameRules _type)
+	{
+		switch (_type)
+		{
+			case GameRules.DefaultRule:
+				return new DefaultRule();
+			default:
+				return new DefaultRule();
+		}
+	}
+
 	public virtual void Initialize()
 	{
 		
@@ -17,15 +28,14 @@ public class GameRule
 
 	}
 
-	public static GameRule GetGameRule(GameRules _type)
+	public virtual void GameStart()
 	{
-		switch (_type)
-		{
-			case GameRules.DefaultRule:
-				return new DefaultRule();
-			default:
-				return new DefaultRule();
-		}
+
+	}
+	
+	public virtual void TurnEnd()
+	{
+
 	}
 }
 
