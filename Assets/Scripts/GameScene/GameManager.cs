@@ -34,8 +34,6 @@ public class GameManager : MonoBehaviour
 	public List<Skill> skills;
 	public GameObject field;
 	public GameObject grid;
-	public Text uiMapName;
-	public Text uiAreaName;
 
 	public bool debugMode = false;
 	
@@ -58,9 +56,8 @@ public class GameManager : MonoBehaviour
 		skills = new List<Skill>();
 		gameRule = GameRule.GetGameRule(stageInfo.gameRule);
 		grid.GetComponent<SpriteRenderer>().color = stageInfo.gridColor;
-		uiMapName.text = stageInfo.mapName;
-		uiAreaName.text = stageInfo.areaName;
 
+		UIManager.Instance.Initialize();
 		TouchManager.Instance.Initialize();
 		CameraManager.Instance.Initialize();
 		gameRule.Initialize();
@@ -75,6 +72,7 @@ public class GameManager : MonoBehaviour
 			units[i].Tick();
 		for (int i = 0; i < skills.Count; ++i)
 			skills[i].Tick();
+		UIManager.Instance.Tick();
 	}
 
 	public List<Unit> FindUnitsWithFaction(int _faction)

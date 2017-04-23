@@ -56,12 +56,20 @@ public class Motion : MonoBehaviour
 
 	protected virtual void OnMotionEnd()
 	{
-		onMotionEnd();
+		if (onMotionEnd != null)
+			onMotionEnd();
 		Destroy(this);
 	}
 
 	public void AddOnMotionEnd(MotionEvent _e)
 	{
 		onMotionEnd += _e;
+	}
+
+	public static void DeleteAllMotion(GameObject _target)
+	{
+		Motion[] m = _target.GetComponents<Motion>();
+		for (int i = 0; i < m.Length; ++i)
+			Destroy(m[i]);
 	}
 }

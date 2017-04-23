@@ -6,7 +6,6 @@ public class MOMove : Motion
 {
 	private Vector3 start;
 	private Vector3 end;
-	private float ease;
 	private bool worldPos;
 
 
@@ -23,19 +22,10 @@ public class MOMove : Motion
 	{
 		base.Update();
 		
-		Vector3 pos = Vector3.Lerp(start, end, ac.Evaluate(timer / endTime));
+		Vector3 pos = Vector3.Lerp(start, end, ac.Evaluate(Mathf.Clamp01(timer / endTime)));
 		if (worldPos)
 			target.transform.position = pos;
 		else
 			target.transform.localPosition = pos;
-	}
-
-	protected override void OnMotionEnd()
-	{
-		if (worldPos)
-			target.transform.position = end;
-		else
-			target.transform.localPosition = end;
-		base.OnMotionEnd();
 	}
 }
