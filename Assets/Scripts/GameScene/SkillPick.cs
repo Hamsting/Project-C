@@ -17,9 +17,18 @@ public class SkillPick : MonoBehaviour
 		new Vector3(   0f, -220f, 0f), // 7
 		new Vector3( 170f, -170f, 0f), // 8
 	};
+	private static readonly int[,] PICKPOS_ZONE =
+	{
+		{ 5, 0, 0, 0 }, // 1
+		{ 5, 3, 0, 0 }, // 2
+		{ 8, 6, 1, 0 }, // 3
+		{ 2, 8, 0, 6 }, // 4
+	};
 
-	public List<GameObject> skills;
+	public List<GameObject> skillPicks;
+	public Unit target;
 
+	private RectTransform tr;
 	private bool enable = false;
 
 
@@ -27,28 +36,35 @@ public class SkillPick : MonoBehaviour
 	public void Initialize()
 	{
 		enable = false;
-		for (int i = 0; i < skills.Count; ++i)
+		tr = this.GetComponent<RectTransform>();
+		for (int i = 0; i < skillPicks.Count; ++i)
 		{
-			skills[i].transform.localPosition = PICKPOS[4];
-			skills[i].SetActive(false);
+			skillPicks[i].transform.localPosition = PICKPOS[4];
+			skillPicks[i].SetActive(false);
 		}
 	}
 
 	public void Tick()
 	{
-		
+		if (enable)
+		{
+			Vector3 pos = CameraManager.Instance.cam.WorldToScreenPoint(target.center);
+			tr.anchoredPosition = pos;
+		}
 	}
 
-	public void EnableSkillPick()
+	public void EnableSkillPick(Unit _target)
 	{
 		if (enable)
 			return;
 
-		for (int i = 0; i < skills.Count; ++i)
+		target = _target;
+		int sCount = target.skills.Count;
+		for (int i = 0; i < sCount; ++i)
 		{
-			GameObject s = skills[i];
+			GameObject s = skillPicks[i];
 			MOMove m = s.AddComponent<MOMove>();
-			m.Initialize(s, ANIMATION_TIME - 0.05f, PICKPOS[4], PICKPOS[2], 1.0f, false);
+			m.Initialize(s, ANIMATION_TIME - 0.05f, PICKPOS[4], PICKPOS[PICKPOS_ZONE[sCount - 1, i]], 1.0f, false, true);
 			MOOpacity o = s.AddComponent<MOOpacity>();
 			o.Initialize(s, MOOpacity.RendererType.Image, ANIMATION_TIME, 0.0f, 1.0f, 1.0f);
 			s.SetActive(true);
@@ -61,11 +77,12 @@ public class SkillPick : MonoBehaviour
 		if (!enable)
 			return;
 
-		for (int i = 0; i < skills.Count; ++i)
+		int sCount = target.skills.Count;
+		for (int i = 0; i < sCount; ++i)
 		{
-			GameObject s = skills[i];
+			GameObject s = skillPicks[i];
 			MOMove m = s.AddComponent<MOMove>();
-			m.Initialize(s, ANIMATION_TIME - 0.05f, PICKPOS[2], PICKPOS[4], 1.0f, false);
+			m.Initialize(s, ANIMATION_TIME - 0.05f, PICKPOS[PICKPOS_ZONE[sCount - 1, i]], PICKPOS[4], 1.0f, false, true);
 			MOOpacity o = s.AddComponent<MOOpacity>();
 			o.Initialize(s, MOOpacity.RendererType.Image, ANIMATION_TIME, 1.0f, 0.0f, 1.0f);
 			if (i == 0)
@@ -78,11 +95,19 @@ public class SkillPick : MonoBehaviour
 	{
 		if (!enable)
 		{ 
-			for (int i = 0; i < skills.Count; ++i)
+			for (int i = 0; i < skillPicks.Count; ++i)
 			{
-				Motion.DeleteAllMotion(skills[i]);
-				skills[i].SetActive(false);
+				Motion.DeleteAllMotion(skillPicks[i]);
+				skillPicks[i].SetActive(false);
 			}
 		}
+	}
+
+	public void ToggleSkillPick(Unit _target)
+	{
+		if (enable)
+			DisableSkillPick();
+		else
+			EnableSkillPick(_target);
 	}
 }

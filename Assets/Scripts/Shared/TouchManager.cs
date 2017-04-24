@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class TouchManager : MonoBehaviour
 {
@@ -33,12 +34,12 @@ public class TouchManager : MonoBehaviour
 
 	public void Initialize()
 	{
-		if (!initialized)
-		{
-			touchable = Input.touchSupported;
-			DontDestroyOnLoad(this.gameObject);
-			initialized = true;
-		}
+		if (initialized)
+			return;
+
+		touchable = Input.touchSupported;
+		DontDestroyOnLoad(this.gameObject);
+		initialized = true;
 	}
 
 	public void Tick()

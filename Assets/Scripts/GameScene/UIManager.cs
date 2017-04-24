@@ -35,11 +35,6 @@ public class UIManager : MonoBehaviour
 
 	public void Tick()
 	{
-		if (Input.GetKeyDown(KeyCode.O))
-			skillPick.EnableSkillPick();
-		if (Input.GetKeyDown(KeyCode.P))
-			skillPick.DisableSkillPick();
-
 		skillPick.Tick();
 	}
 }

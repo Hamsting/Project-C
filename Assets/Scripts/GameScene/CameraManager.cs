@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
+	private static readonly float DRAG_START_DISTANCE = 100f;
 	private static CameraManager _instance;
 	public static CameraManager Instance
 	{
@@ -21,6 +22,7 @@ public class CameraManager : MonoBehaviour
 
 	public Camera cam;
 	public Camera touchCam;
+	public bool cameraMoving = false;
 	public float camSize = 1f;
 	public float camRatio = 1f;
 	public Transform camLimitTL;
@@ -29,7 +31,6 @@ public class CameraManager : MonoBehaviour
 	private float maxCamSize = 5f;
 	private float minCamSize = 1f;
 	private float zoomingSpeed = 7f;
-	private bool cameraMoving = false;
 	private Vector3 firstCamPos = Vector3.zero;
 	private Vector3 targetCamPos = Vector3.zero;
 
@@ -52,7 +53,7 @@ public class CameraManager : MonoBehaviour
 		float zoomingPercent = TouchManager.Instance.GetZoomingPercent();
 		if (zoomingPercent != 0f)
 		{
-			camSize = Mathf.Clamp(camSize + zoomingSpeed * zoomingPercent, 1f, 5f);
+			camSize = Mathf.Clamp(camSize + zoomingSpeed * zoomingPercent, minCamSize, maxCamSize);
 			cam.orthographicSize = camSize;
 			touchCam.orthographicSize = camSize;
 
@@ -66,7 +67,7 @@ public class CameraManager : MonoBehaviour
 			if (!cameraMoving)
 			{
 				float sDragDis = Vector3.Distance(TouchManager.Instance.screenPosition, TouchManager.Instance.firstScreenPosition);
-				if (sDragDis >= 30f)
+				if (sDragDis >= DRAG_START_DISTANCE)
 				{
 					cameraMoving = true;
 					firstCamPos = cam.transform.position;
@@ -82,6 +83,11 @@ public class CameraManager : MonoBehaviour
 				touchCam.transform.position = camPos;
 			}
         }
+		else if (TouchManager.Instance.touchState == TouchState.Release)
+		{
+			cameraMoving = false;
+		}
+
 		if (cam.transform.position != targetCamPos)
 		{
 			Vector3 move = Vector3.Lerp(cam.transform.position, targetCamPos, 0.25f);

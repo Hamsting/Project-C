@@ -32,8 +32,10 @@ public class GameManager : MonoBehaviour
 	public GameRule gameRule;
 	public List<Unit> units;
 	public List<Skill> skills;
-	public GameObject field;
-	public GameObject grid;
+	public FieldState[,] fieldState;
+	public Grid grid;
+	public Background background;
+	public GameObject unitGroup;
 
 	public bool debugMode = false;
 	
@@ -55,12 +57,17 @@ public class GameManager : MonoBehaviour
 		units = new List<Unit>();
 		skills = new List<Skill>();
 		gameRule = GameRule.GetGameRule(stageInfo.gameRule);
-		grid.GetComponent<SpriteRenderer>().color = stageInfo.gridColor;
-
+		fieldState = new FieldState[12, 4];
+		for (int x = 0; x < 12; ++x)
+			for (int y = 0; y < 4; ++y)
+				fieldState[x, y] = new FieldState();
+		
 		UIManager.Instance.Initialize();
 		TouchManager.Instance.Initialize();
 		CameraManager.Instance.Initialize();
 		gameRule.Initialize();
+		grid.Initialize();
+		background.Initialize();
 	}
 	
 	void Update()
@@ -73,6 +80,11 @@ public class GameManager : MonoBehaviour
 		for (int i = 0; i < skills.Count; ++i)
 			skills[i].Tick();
 		UIManager.Instance.Tick();
+		grid.Tick();
+		background.Tick();
+
+		if (Input.GetKeyDown(KeyCode.O))
+			PushTestUnit();
 	}
 
 	public List<Unit> FindUnitsWithFaction(int _faction)
@@ -93,5 +105,30 @@ public class GameManager : MonoBehaviour
 				sl.Add(skills[i]);
 
 		return sl;
+	}
+
+	public void PushTestUnit()
+	{
+		UnitInfo info = UnitDB.Instance.FinUnitInfoWithID(0004);
+		GameObject dupe = Instantiate(info.unitPrefab, unitGroup.transform);
+		Unit u = dupe.GetComponent<Unit>();
+		u.Initialize();
+        units.Add(u);
+
+		SkillUse s1 = new SkillUse();
+		s1.Initialize(999999);
+		u.skills.Add(s1);
+		
+		SkillUse s2 = new SkillUse();
+		s2.Initialize(999999);
+		u.skills.Add(s2);
+		
+		SkillUse s3 = new SkillUse();
+		s3.Initialize(999999);
+		u.skills.Add(s3);
+
+		SkillUse s4 = new SkillUse();
+		s4.Initialize(999999);
+		u.skills.Add(s4);
 	}
 }

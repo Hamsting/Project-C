@@ -14,17 +14,19 @@ public class Unit : MonoBehaviour
 	public float criticalPower = 150.0f;
 	public List<SkillUse> skills;
 	public List<Buff> buffs;
+	public Vector2 center;
 
 	protected bool movable = true;
 	protected bool attackable = true;
-
+	protected BoxCollider2D col;
 
 
 	public virtual void Initialize()
 	{
 		skills = new List<SkillUse>();
 		buffs = new List<Buff>();
-	}
+		col = this.GetComponent<BoxCollider2D>();
+    }
 	
 	public virtual void Tick ()
 	{
@@ -34,6 +36,7 @@ public class Unit : MonoBehaviour
 			skills[i].Tick();
 		for (int i = 0; i < buffs.Count; ++i)
 			buffs[i].Tick();
+		center = this.transform.TransformPoint(col.offset);
 	}
 
 	public void OnTurnStarted()
@@ -76,5 +79,11 @@ public class Unit : MonoBehaviour
 			return -1;
 		}
 		return skills[_number].Usable();
+	}
+
+	public void OnMouseUp()
+	{
+		if (!CameraManager.Instance.cameraMoving)
+			UIManager.Instance.skillPick.ToggleSkillPick(this);
 	}
 }
