@@ -109,26 +109,30 @@ public class GameManager : MonoBehaviour
 
 	public void PushTestUnit()
 	{
+		int x = Random.Range(0, 12);
+		int y = Random.Range(0, 4);
+		int sc = Random.Range(1, 5);
+		int f = (Random.Range(0, 2) == 0) ? FACTION_BLUE : FACTION_RED;
+
+		if (!fieldState[x, y].CanAddUnit(f))
+			return;
+
 		UnitInfo info = UnitDB.Instance.FinUnitInfoWithID(0004);
 		GameObject dupe = Instantiate(info.unitPrefab, unitGroup.transform);
 		Unit u = dupe.GetComponent<Unit>();
-		u.Initialize();
+
+		u.faction = f;
+		u.Initialize(x, y);
         units.Add(u);
+		fieldState[x, y].AddUnit(u);
 
-		SkillUse s1 = new SkillUse();
-		s1.Initialize(999999);
-		u.skills.Add(s1);
-		
-		SkillUse s2 = new SkillUse();
-		s2.Initialize(999999);
-		u.skills.Add(s2);
-		
-		SkillUse s3 = new SkillUse();
-		s3.Initialize(999999);
-		u.skills.Add(s3);
+		for (int i = 0; i < sc; ++i)
+		{
+			SkillUse s = new SkillUse();
+			s.Initialize(999999);
+			u.skills.Add(s);
+		}
 
-		SkillUse s4 = new SkillUse();
-		s4.Initialize(999999);
-		u.skills.Add(s4);
+		UIManager.Instance.minimap.UpdateFlag();
 	}
 }

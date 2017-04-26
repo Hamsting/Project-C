@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
-	private static readonly float DRAG_START_DISTANCE = 100f;
+	private static float DRAG_START_DISTANCE = 100f;
 	private static CameraManager _instance;
 	public static CameraManager Instance
 	{
@@ -23,6 +23,7 @@ public class CameraManager : MonoBehaviour
 	public Camera cam;
 	public Camera touchCam;
 	public bool cameraMoving = false;
+	public bool cameraZooming = false;
 	public float camSize = 1f;
 	public float camRatio = 1f;
 	public Transform camLimitTL;
@@ -60,8 +61,12 @@ public class CameraManager : MonoBehaviour
 			targetCamPos.x = Mathf.Clamp(targetCamPos.x, camLimitTL.transform.position.x + (camSize * camRatio), camLimitBR.transform.position.x - (camSize * camRatio));
 			targetCamPos.y = Mathf.Clamp(targetCamPos.y, camLimitBR.transform.position.y + camSize, camLimitTL.transform.position.y - camSize);
 			touchCam.transform.position = targetCamPos;
+			cameraZooming = true;
 		}
-		if ((!TouchManager.Instance.touchable || (TouchManager.Instance.touchable && Input.touchCount == 1)) && 
+		else
+			cameraZooming = false;
+
+        if ((!TouchManager.Instance.touchable || (TouchManager.Instance.touchable && Input.touchCount == 1)) && 
 			TouchManager.Instance.touchState == TouchState.Stay)
 		{
 			if (!cameraMoving)
@@ -95,5 +100,15 @@ public class CameraManager : MonoBehaviour
 				move = targetCamPos;
 			cam.transform.position = move;
 		}
+	}
+
+	public void FocusUnit(Unit _u)
+	{
+		Vector3 camPos = _u.center;
+		camPos.x = Mathf.Clamp(camPos.x, camLimitTL.transform.position.x + (camSize * camRatio), camLimitBR.transform.position.x - (camSize * camRatio));
+		camPos.y = Mathf.Clamp(camPos.y, camLimitBR.transform.position.y + camSize, camLimitTL.transform.position.y - camSize);
+		camPos.z = -10f;
+		targetCamPos = camPos;
+		touchCam.transform.position = camPos;
 	}
 }

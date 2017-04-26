@@ -22,6 +22,7 @@ public class UIManager : MonoBehaviour
 	public Text uiMapName;
 	public Text uiAreaName;
 	public SkillPick skillPick;
+	public Minimap minimap;
 
 
 	public void Initialize()
@@ -31,10 +32,17 @@ public class UIManager : MonoBehaviour
 		uiAreaName.text = g.stageInfo.areaName;
 
 		skillPick.Initialize();
+		minimap.Initialize();
 	}
 
 	public void Tick()
 	{
 		skillPick.Tick();
+		minimap.Tick();
+	}
+
+	public void OnSettingButtonReleased()
+	{
+		GameManager.Instance.PushTestUnit();
 	}
 }

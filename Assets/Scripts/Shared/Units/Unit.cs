@@ -15,10 +15,12 @@ public class Unit : MonoBehaviour
 	public List<SkillUse> skills;
 	public List<Buff> buffs;
 	public Vector2 center;
+	public FieldPos fieldPos;
 
 	protected bool movable = true;
 	protected bool attackable = true;
 	protected BoxCollider2D col;
+
 
 
 	public virtual void Initialize()
@@ -26,7 +28,16 @@ public class Unit : MonoBehaviour
 		skills = new List<SkillUse>();
 		buffs = new List<Buff>();
 		col = this.GetComponent<BoxCollider2D>();
+		fieldPos = new FieldPos(0, 0);
+		SetGridPos();
     }
+
+	public virtual void Initialize(int _fx, int _fy)
+	{
+		Initialize();
+		fieldPos = new FieldPos(_fx, _fy);
+		SetGridPos();
+	}
 	
 	public virtual void Tick ()
 	{
@@ -83,7 +94,22 @@ public class Unit : MonoBehaviour
 
 	public void OnMouseUp()
 	{
-		if (!CameraManager.Instance.cameraMoving)
+		if (!CameraManager.Instance.cameraMoving && !CameraManager.Instance.cameraZooming)
 			UIManager.Instance.skillPick.ToggleSkillPick(this);
+	}
+	
+	public void SetGridPos()
+	{
+		this.transform.position = GameManager.Instance.grid.CalculateGridPos(this);
+		if (faction == GameManager.FACTION_RED)
+			this.transform.localScale = new Vector3(-1f, 1f, 1f);
+		else
+			this.transform.localScale = new Vector3(1f, 1f, 1f);
+	}
+
+	public void SetFieldPos(FieldPos _fpos)
+	{
+		fieldPos = _fpos;
+		SetGridPos();
 	}
 }

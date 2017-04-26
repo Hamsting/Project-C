@@ -19,7 +19,7 @@ public class SkillPick : MonoBehaviour
 	};
 	private static readonly int[,] PICKPOS_ZONE =
 	{
-		{ 5, 0, 0, 0 }, // 1
+		{ 5, 3, 0, 0 }, // 1
 		{ 5, 3, 0, 0 }, // 2
 		{ 8, 6, 1, 0 }, // 3
 		{ 2, 8, 0, 6 }, // 4
@@ -64,12 +64,16 @@ public class SkillPick : MonoBehaviour
 		{
 			GameObject s = skillPicks[i];
 			MOMove m = s.AddComponent<MOMove>();
-			m.Initialize(s, ANIMATION_TIME - 0.05f, PICKPOS[4], PICKPOS[PICKPOS_ZONE[sCount - 1, i]], 1.0f, false, true);
+			if (sCount == 1 && target.faction == GameManager.FACTION_RED)
+				m.Initialize(s, ANIMATION_TIME - 0.05f, PICKPOS[4], PICKPOS[PICKPOS_ZONE[sCount - 1, 1]], 1.0f, false, true);
+			else
+				m.Initialize(s, ANIMATION_TIME - 0.05f, PICKPOS[4], PICKPOS[PICKPOS_ZONE[sCount - 1, i]], 1.0f, false, true);
 			MOOpacity o = s.AddComponent<MOOpacity>();
 			o.Initialize(s, MOOpacity.RendererType.Image, ANIMATION_TIME, 0.0f, 1.0f, 1.0f);
 			s.SetActive(true);
 		}
 		enable = true;
+		CameraManager.Instance.FocusUnit(target);
 	}
 
 	public void DisableSkillPick()
@@ -82,7 +86,10 @@ public class SkillPick : MonoBehaviour
 		{
 			GameObject s = skillPicks[i];
 			MOMove m = s.AddComponent<MOMove>();
-			m.Initialize(s, ANIMATION_TIME - 0.05f, PICKPOS[PICKPOS_ZONE[sCount - 1, i]], PICKPOS[4], 1.0f, false, true);
+			if (sCount == 1 && target.faction == GameManager.FACTION_RED)
+				m.Initialize(s, ANIMATION_TIME - 0.05f, PICKPOS[PICKPOS_ZONE[sCount - 1, 1]], PICKPOS[4], 1.0f, false, true);
+			else
+				m.Initialize(s, ANIMATION_TIME - 0.05f, PICKPOS[PICKPOS_ZONE[sCount - 1, i]], PICKPOS[4], 1.0f, false, true);
 			MOOpacity o = s.AddComponent<MOOpacity>();
 			o.Initialize(s, MOOpacity.RendererType.Image, ANIMATION_TIME, 1.0f, 0.0f, 1.0f);
 			if (i == 0)
@@ -100,13 +107,31 @@ public class SkillPick : MonoBehaviour
 				Motion.DeleteAllMotion(skillPicks[i]);
 				skillPicks[i].SetActive(false);
 			}
+			target = null;
 		}
+	}
+
+	private void ReEnableSkillPick(Unit _target)
+	{
+		for (int i = 0; i < skillPicks.Count; ++i)
+		{
+			Motion.DeleteAllMotion(skillPicks[i]);
+			skillPicks[i].transform.localPosition = PICKPOS[4];
+			skillPicks[i].SetActive(false);
+		}
+		enable = false;
+		EnableSkillPick(_target);
 	}
 
 	public void ToggleSkillPick(Unit _target)
 	{
 		if (enable)
-			DisableSkillPick();
+		{
+			if (target != null && target != _target)
+				ReEnableSkillPick(_target);
+			else
+				DisableSkillPick();
+		}
 		else
 			EnableSkillPick(_target);
 	}
